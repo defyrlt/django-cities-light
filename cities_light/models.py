@@ -20,7 +20,7 @@ from .settings import *
 
 
 __all__ = ['Country', 'Region', 'City', 'CONTINENT_CHOICES', 'to_search',
-    'to_ascii']
+           'to_ascii']
 
 ALPHA_REGEXP = re.compile('[\W_]+', re.UNICODE)
 
@@ -78,6 +78,7 @@ def set_display_name(sender, instance=None, **kwargs):
 
 @python_2_unicode_compatible
 class Base(models.Model):
+
     """
     Base model with boilerplate for all models.
     """
@@ -99,6 +100,7 @@ class Base(models.Model):
 
 
 class Country(Base):
+
     """
     Country model.
     """
@@ -108,7 +110,7 @@ class Country(Base):
     code2 = models.CharField(max_length=2, null=True, blank=True, unique=True)
     code3 = models.CharField(max_length=3, null=True, blank=True, unique=True)
     continent = models.CharField(max_length=2, db_index=True,
-        choices=CONTINENT_CHOICES)
+                                 choices=CONTINENT_CHOICES)
     tld = models.CharField(max_length=5, blank=True, db_index=True)
     phone = models.CharField(max_length=20, null=True)
 
@@ -117,7 +119,14 @@ class Country(Base):
 signals.pre_save.connect(set_name_ascii, sender=Country)
 
 
+class RegionManager(models.Manager):
+
+    def get_queryset(self):
+        return super(RegionManager, self).get_queryset().filter(deleted=False)
+
+
 class Region(Base):
+
     """
     Region/State model.
     """
@@ -125,9 +134,13 @@ class Region(Base):
     name = models.CharField(max_length=200, db_index=True)
     display_name = models.CharField(max_length=200)
     geoname_code = models.CharField(max_length=50, null=True, blank=True,
-        db_index=True)
+                                    db_index=True)
 
     country = models.ForeignKey(Country)
+
+    deleted = models.BooleanField(detault=False)
+
+    objects = RegionManager()
 
     class Meta(Base.Meta):
         unique_together = (('country', 'name'), ('country', 'slug'))
@@ -142,16 +155,18 @@ signals.pre_save.connect(set_display_name, sender=Region)
 
 
 class ToSearchTextField(models.TextField):
+
     """
     Trivial TextField subclass that passes values through to_search
     automatically.
     """
+
     def get_prep_lookup(self, lookup_type, value):
         """
         Return the value passed through to_search().
         """
         value = super(ToSearchTextField, self).get_prep_lookup(lookup_type,
-            value)
+                                                               value)
         return to_search(value)
 
     def south_field_triple(self):
@@ -164,6 +179,7 @@ class ToSearchTextField(models.TextField):
 
 
 class City(Base):
+
     """
     City model.
     """
@@ -172,12 +188,12 @@ class City(Base):
     display_name = models.CharField(max_length=200)
 
     search_names = ToSearchTextField(max_length=4000,
-        db_index=INDEX_SEARCH_NAMES, blank=True, default='')
+                                     db_index=INDEX_SEARCH_NAMES, blank=True, default='')
 
     latitude = models.DecimalField(max_digits=8, decimal_places=5,
-        null=True, blank=True)
+                                   null=True, blank=True)
     longitude = models.DecimalField(max_digits=8, decimal_places=5,
-        null=True, blank=True)
+                                    null=True, blank=True)
 
     region = models.ForeignKey(Region, blank=True, null=True)
     country = models.ForeignKey(Country)
@@ -192,7 +208,7 @@ class City(Base):
     def get_display_name(self):
         if self.region_id:
             return '%s, %s, %s' % (self.name, self.region.name,
-                self.country.name)
+                                   self.country.name)
         else:
             return '%s, %s' % (self.name, self.country.name)
 signals.pre_save.connect(set_name_ascii, sender=City)
