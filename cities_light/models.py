@@ -138,7 +138,7 @@ class Region(Base):
 
     country = models.ForeignKey(Country)
 
-    deleted = models.BooleanField(detault=False)
+    deleted = models.BooleanField(default=False)
 
     objects = RegionManager()
 
