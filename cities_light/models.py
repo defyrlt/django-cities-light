@@ -140,6 +140,8 @@ class Region(Base):
 
     deleted = models.BooleanField(default=False)
 
+    is_region = models.BooleanField(default=False)
+
     objects = RegionManager()
 
     class Meta(Base.Meta):
