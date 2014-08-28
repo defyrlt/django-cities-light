@@ -4,7 +4,7 @@ from django import forms
 
 from .models import Country, Region, City, SalesRegion
 
-__all__ = ['CountryForm', 'RegionForm', 'CityForm']
+__all__ = ['CountryForm', 'RegionForm', 'CityForm', 'SalesRegionForm']
 
 
 class CountryForm(forms.ModelForm):
