@@ -20,7 +20,7 @@ from .settings import *
 
 
 __all__ = ['Country', 'Region', 'City', 'CONTINENT_CHOICES', 'to_search',
-           'to_ascii']
+           'to_ascii', 'SalesRegion']
 
 ALPHA_REGEXP = re.compile('[\W_]+', re.UNICODE)
 
