@@ -26,6 +26,16 @@ class RegionForm(forms.ModelForm):
                    'geoname_code')
 
 
+class SalesRegionForm(forms.ModelForm):
+    """
+    SalesRegion model form.
+    """
+    class Meta:
+        model = SalesRegion
+        exclude = ('name_ascii', 'slug', 'geoname_id', 'display_name',
+                   'geoname_code')
+
+
 class CityForm(forms.ModelForm):
     """
     City model form.
