@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django import forms
 
-from .models import Country, Region, City
+from .models import Country, Region, City, SalesRegion
 
 __all__ = ['CountryForm', 'RegionForm', 'CityForm']
 
