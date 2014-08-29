@@ -148,7 +148,7 @@ class Region(Base):
         verbose_name_plural = _('regions/states')
 
     def get_display_name(self):
-        return '%s, %s' % (self.name, self.country.name)
+        return '%s' % (self.name)
 
 signals.pre_save.connect(set_name_ascii, sender=Region)
 signals.pre_save.connect(set_display_name, sender=Region)
