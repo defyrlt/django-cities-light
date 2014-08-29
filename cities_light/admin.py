@@ -57,6 +57,21 @@ class RegionAdmin(admin.ModelAdmin):
 admin.site.register(Region, RegionAdmin)
 
 
+class SalesRegionAdmin(admin.ModelAdmin):
+    """
+    ModelAdmin for SalesRegion.
+    """
+    search_fields = (
+        'name',
+        'name_ascii',
+    )
+    list_display = (
+        'name',
+    )
+    form = SalesRegionForm
+admin.site.register(SalesRegion, SalesRegionAdmin)
+
+
 class CityChangeList(ChangeList):
     def get_query_set(self, request):
         if 'q' in list(request.GET.keys()):

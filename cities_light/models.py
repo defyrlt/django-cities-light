@@ -20,7 +20,7 @@ from .settings import *
 
 
 __all__ = ['Country', 'Region', 'City', 'CONTINENT_CHOICES', 'to_search',
-           'to_ascii']
+           'to_ascii', 'SalesRegion']
 
 ALPHA_REGEXP = re.compile('[\W_]+', re.UNICODE)
 
@@ -152,6 +152,42 @@ class Region(Base):
 
 signals.pre_save.connect(set_name_ascii, sender=Region)
 signals.pre_save.connect(set_display_name, sender=Region)
+
+
+class SalesRegionManager(models.Manager):
+
+    def get_queryset(self):
+        return super(SalesRegionManager, self).get_queryset().filter(deleted=False)
+
+
+class SalesRegion(Base):
+
+    """
+    SalesRegion model.
+    """
+
+    name = models.CharField(max_length=200, db_index=True)
+    display_name = models.CharField(max_length=200)
+    geoname_code = models.CharField(max_length=50, null=True, blank=True,
+                                    db_index=True)
+
+    country = models.ManyToManyField('Country', blank=True)
+    region = models.ManyToManyField('Region', blank=True)
+    city = models.ManyToManyField('City', blank=True)
+
+    deleted = models.BooleanField(default=False)
+
+    objects = SalesRegionManager()
+
+    class Meta(Base.Meta):
+        verbose_name = _('Sales region')
+        verbose_name_plural = _('Sales regions')
+
+    def get_display_name(self):
+        return '%s' % (self.name)
+
+signals.pre_save.connect(set_name_ascii, sender=SalesRegion)
+signals.pre_save.connect(set_display_name, sender=SalesRegion)
 
 
 class ToSearchTextField(models.TextField):
