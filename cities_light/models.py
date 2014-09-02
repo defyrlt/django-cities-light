@@ -99,6 +99,12 @@ class Base(models.Model):
         return self.name
 
 
+class CountryManager(models.Manager):
+
+    def get_queryset(self):
+        return super(CountryManager, self).get_queryset().filter(deleted=False)
+
+
 class Country(Base):
 
     """
@@ -113,6 +119,10 @@ class Country(Base):
                                  choices=CONTINENT_CHOICES)
     tld = models.CharField(max_length=5, blank=True, db_index=True)
     phone = models.CharField(max_length=20, null=True)
+
+    deleted = models.BooleanField(default=False)
+
+    objects = CountryManager()
 
     class Meta(Base.Meta):
         verbose_name_plural = _('countries')
@@ -214,6 +224,12 @@ class ToSearchTextField(models.TextField):
         return (field_class, args, kwargs)
 
 
+class CityManager(models.Manager):
+
+    def get_queryset(self):
+        return super(CityManager, self).get_queryset().filter(deleted=False)
+
+
 class City(Base):
 
     """
@@ -236,6 +252,10 @@ class City(Base):
     population = models.BigIntegerField(null=True, blank=True, db_index=True)
     feature_code = models.CharField(max_length=10, null=True, blank=True,
                                     db_index=True)
+
+    deleted = models.BooleanField(default=False)
+
+    objects = CityManager()
 
     class Meta(Base.Meta):
         unique_together = (('region', 'name'), ('region', 'slug'))
