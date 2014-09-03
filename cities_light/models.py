@@ -153,7 +153,7 @@ class Region(Base):
     country = models.ForeignKey(Country)
 
     class Meta(Base.Meta):
-        unique_together = (('country', 'name'), ('country', 'slug'))
+        unique_together = (('country', 'name', 'deleted'), ('country', 'slug', 'deleted'))
         verbose_name = _('region/state')
         verbose_name_plural = _('regions/states')
 
