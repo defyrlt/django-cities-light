@@ -17,7 +17,8 @@ class Migration(DataMigration):
         for region in regions:
             region.display_name = region.display_name.split(',')[0]
 
-        bulk_update(regions, update_fields=['display_name'])
+        if regions:
+            bulk_update(regions, update_fields=['display_name'])
 
     def backwards(self, orm):
         "Write your backwards methods here."
