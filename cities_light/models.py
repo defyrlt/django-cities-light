@@ -76,6 +76,21 @@ def set_display_name(sender, instance=None, **kwargs):
     instance.display_name = instance.get_display_name()
 
 
+class CitiesLightManager(models.Manager):
+    deleted = False
+    def __init__(self, *args, **kwargs):
+        deleted = kwargs.get('deleted', None)
+        if deleted is not None:
+            self.deleted = kwargs.pop('deleted')
+        super(CitiesLightManager, self).__init__(*args, **kwargs)
+
+
+    def get_queryset(self):
+        return super(CitiesLightManager, self)\
+            .get_queryset()\
+            .filter(deleted=self.deleted)
+
+
 @python_2_unicode_compatible
 class Base(models.Model):
 
@@ -88,6 +103,11 @@ class Base(models.Model):
     geoname_id = models.IntegerField(null=True, blank=True, unique=True)
     alternate_names = models.TextField(null=True, blank=True, default='')
 
+    deleted = models.BooleanField(default=False)
+
+    objects = CitiesLightManager()
+    deleted_objects = CitiesLightManager(deleted=True)
+
     class Meta:
         abstract = True
         ordering = ['name']
@@ -97,12 +117,6 @@ class Base(models.Model):
         if display_name:
             return display_name
         return self.name
-
-
-class CountryManager(models.Manager):
-
-    def get_queryset(self):
-        return super(CountryManager, self).get_queryset().filter(deleted=False)
 
 
 class Country(Base):
@@ -120,19 +134,9 @@ class Country(Base):
     tld = models.CharField(max_length=5, blank=True, db_index=True)
     phone = models.CharField(max_length=20, null=True)
 
-    deleted = models.BooleanField(default=False)
-
-    objects = CountryManager()
-
     class Meta(Base.Meta):
         verbose_name_plural = _('countries')
 signals.pre_save.connect(set_name_ascii, sender=Country)
-
-
-class RegionManager(models.Manager):
-
-    def get_queryset(self):
-        return super(RegionManager, self).get_queryset().filter(deleted=False)
 
 
 class Region(Base):
@@ -148,10 +152,6 @@ class Region(Base):
 
     country = models.ForeignKey(Country)
 
-    deleted = models.BooleanField(default=False)
-
-    objects = RegionManager()
-
     class Meta(Base.Meta):
         unique_together = (('country', 'name', 'deleted'), ('country', 'slug', 'deleted'))
         verbose_name = _('region/state')
@@ -162,12 +162,6 @@ class Region(Base):
 
 signals.pre_save.connect(set_name_ascii, sender=Region)
 signals.pre_save.connect(set_display_name, sender=Region)
-
-
-class SalesRegionManager(models.Manager):
-
-    def get_queryset(self):
-        return super(SalesRegionManager, self).get_queryset().filter(deleted=False)
 
 
 class SalesRegion(Base):
@@ -184,10 +178,6 @@ class SalesRegion(Base):
     country = models.ManyToManyField('Country', blank=True)
     region = models.ManyToManyField('Region', blank=True)
     city = models.ManyToManyField('City', blank=True)
-
-    deleted = models.BooleanField(default=False)
-
-    objects = SalesRegionManager()
 
     class Meta(Base.Meta):
         verbose_name = _('Sales region')
@@ -224,12 +214,6 @@ class ToSearchTextField(models.TextField):
         return (field_class, args, kwargs)
 
 
-class CityManager(models.Manager):
-
-    def get_queryset(self):
-        return super(CityManager, self).get_queryset().filter(deleted=False)
-
-
 class City(Base):
 
     """
@@ -252,10 +236,6 @@ class City(Base):
     population = models.BigIntegerField(null=True, blank=True, db_index=True)
     feature_code = models.CharField(max_length=10, null=True, blank=True,
                                     db_index=True)
-
-    deleted = models.BooleanField(default=False)
-
-    objects = CityManager()
 
     class Meta(Base.Meta):
         unique_together = (('region', 'name'), ('region', 'slug'))
