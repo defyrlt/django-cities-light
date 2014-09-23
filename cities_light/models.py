@@ -243,10 +243,7 @@ class City(Base):
 
     def get_display_name(self):
         if self.region_id:
-            return '%s, %s, %s' % (self.name, self.region.name,
-                                   self.country.name)
-        else:
-            return '%s, %s' % (self.name, self.country.name)
+            return '%s' % self.name
 signals.pre_save.connect(set_name_ascii, sender=City)
 signals.pre_save.connect(set_display_name, sender=City)
 
