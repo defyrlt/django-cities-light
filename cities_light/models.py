@@ -242,8 +242,7 @@ class City(Base):
         verbose_name_plural = _('cities')
 
     def get_display_name(self):
-        if self.region_id:
-            return '%s' % self.name
+        return '%s' % self.name
 signals.pre_save.connect(set_name_ascii, sender=City)
 signals.pre_save.connect(set_display_name, sender=City)
 
