@@ -78,12 +78,12 @@ def set_display_name(sender, instance=None, **kwargs):
 
 class CitiesLightManager(models.Manager):
     deleted = False
+
     def __init__(self, *args, **kwargs):
         deleted = kwargs.get('deleted', None)
         if deleted is not None:
             self.deleted = kwargs.pop('deleted')
         super(CitiesLightManager, self).__init__(*args, **kwargs)
-
 
     def get_queryset(self):
         return super(CitiesLightManager, self)\
@@ -102,6 +102,7 @@ class Base(models.Model):
     slug = autoslug.AutoSlugField(populate_from='name_ascii')
     geoname_id = models.IntegerField(null=True, blank=True, unique=True)
     alternate_names = models.TextField(null=True, blank=True, default='')
+    language = models.ForeignKey('core.Language')
 
     deleted = models.BooleanField(default=False)
 
