@@ -245,7 +245,7 @@ class City(Base):
         verbose_name_plural = _('cities')
 
     def __unicode__(self):
-        return u'%s (%s)' % (self.name, self.region.name)
+        return u'%s (%s)' % (self.name, self.district)
 
     def get_display_name(self):
         return '%s' % self.name
