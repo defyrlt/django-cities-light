@@ -237,10 +237,15 @@ class City(Base):
     population = models.BigIntegerField(null=True, blank=True, db_index=True)
     feature_code = models.CharField(max_length=10, null=True, blank=True,
                                     db_index=True)
+    district = models.CharField(max_length=200, db_index=True, null=True,
+                                blank=True)
 
     class Meta(Base.Meta):
         unique_together = (('region', 'name'), ('region', 'slug'))
         verbose_name_plural = _('cities')
+
+    def __unicode__(self):
+        return u'%s (%s)' % (self.name, self.region.name)
 
     def get_display_name(self):
         return '%s' % self.name
